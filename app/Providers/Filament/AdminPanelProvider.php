@@ -28,6 +28,9 @@ class AdminPanelProvider extends PanelProvider
             ->id('dashboard')
             ->path('dashboard')
             ->login()
+            ->brandName('Rocket ShM')
+            ->brandLogo(asset('assets/logo.png'))
+            ->favicon(asset('assets/logo.png'))
             ->colors([
                 'primary' => '#1BC5BD',
             ])
