@@ -88,7 +88,7 @@ return [
 
     'auth' => [
         'guards' => [
-            'web' => [
+            'admin' => [
                 'driver' => 'session',
                 'provider' => 'admins',
             ],
