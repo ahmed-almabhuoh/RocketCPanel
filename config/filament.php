@@ -85,22 +85,4 @@ return [
     */
 
     'livewire_loading_delay' => 'default',
-
-    'auth' => [
-        'guards' => [
-            'admin' => [
-                'driver' => 'session',
-                'provider' => 'admins',
-            ],
-        ],
-
-        'providers' => [
-            'admins' => [
-                'driver' => 'eloquent',
-                'model' => App\Models\Admin::class,
-            ],
-        ],
-
-    ],
-
 ];
