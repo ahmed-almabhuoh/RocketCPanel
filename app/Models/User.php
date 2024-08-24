@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Notifications\User\GenerateDriverPasswordNotification;
 use Carbon\Carbon;
+use Filament\Models\Contracts\HasName;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -15,7 +16,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail, HasName
 {
     use HasFactory, Notifiable;
 
@@ -247,4 +248,19 @@ class User extends Authenticatable implements MustVerifyEmail
     // {
     //     return 'users.'.$this->id;
     // }
+
+    public function getFilamentName(): string
+    {
+        return $this->fullName;
+    }
+
+    /**
+   * Get the user's full name.
+   *
+   * @return string
+   */
+    public function getFullNameAttribute()
+    {
+        return "{$this->fname} {$this->lname}";
+    }
 }
