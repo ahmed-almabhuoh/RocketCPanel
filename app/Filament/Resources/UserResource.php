@@ -134,7 +134,7 @@ class UserResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation()
-                        ->visible(fn(User $record) => ($record->account_status == 'inactive' || $record->account_status == 'pending')),
+                        ->visible(fn(User $record) => $record->account_status != 'active'),
 
 
                     Tables\Actions\Action::make('pending')
@@ -152,7 +152,7 @@ class UserResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation()
-                        ->visible(fn(User $record) => ($record->account_status == 'active' || $record->account_status == 'inactive')),
+                        ->visible(fn(User $record) => $record->account_status != 'pending'),
 
 
                     Tables\Actions\DeleteAction::make(),
@@ -171,7 +171,7 @@ class UserResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation()
-                        ->visible(fn(User $record) => ($record->account_status == 'inactive' || $record->account_status == 'pending')),
+                        ->visible(fn(User $record) => $record->account_status != 'inactive'),
                 ]),
 
             ])
