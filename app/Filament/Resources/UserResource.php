@@ -8,6 +8,11 @@ use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Forms;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -21,6 +26,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class UserResource extends Resource
 {
@@ -39,6 +45,93 @@ class UserResource extends Resource
         return $form
             ->schema([
                 //
+
+                Group::make()->schema([
+                    Section::make('General')->schema([
+                        TextInput::make('fname')
+                            ->required()
+                            ->minValue(2)
+                            ->maxValue(50)
+                            ->label('First name'),
+
+                        TextInput::make('lname')
+                            ->required()
+                            ->minValue(2)
+                            ->maxValue(50)
+                            ->label('Last name'),
+
+                        TextInput::make('phone')
+                            ->required()
+                            ->unique()
+                            ->minValue(7)
+                            ->maxValue(20)
+                            ->label('Phone No.'),
+
+                        TextInput::make('email')
+                            ->required()
+                            ->unique()
+                            ->email()
+                            ->label('Email address'),
+
+                        TextInput::make('username')
+                            ->label('Username')
+                            ->required()
+                            ->unique()
+                            ->columnSpanFull(),
+
+                        TextInput::make('password')
+                            ->required()
+                            ->minValue(8)
+                            ->maxValue(50)
+                            ->helperText('User password will automatically change, with notify user about this action.')
+                            ->default(Str::random(8))
+                            ->columnSpanFull(),
+
+                    ])->columns(2),
+                ]),
+
+                Group::make()->schema([
+                    Section::make('Account Settings')->schema([
+                        Select::make('role')
+                            ->options([
+                                'Director' => 'Director',
+                                'Customer' => 'Customer',
+                                'Driver' => 'Driver',
+                            ])
+                            ->required()
+                            ->rule([
+                                'in:Director,Customer,Driver'
+                            ])
+                            ->reactive()
+                            ->label('Account role'),
+
+                        Select::make('account_status')
+                            ->options([
+                                'active' => 'Active',
+                                'pending' => 'Pending',
+                                'inactive' => 'Inactive',
+                            ])
+                            ->required()
+                            ->rule([
+                                'in:active,pending,inactive'
+                            ])
+                            ->label('Account status'),
+
+                        Select::make('user_id')
+                            ->relationship('director', 'fname')
+                            ->label('Direct')
+                            ->rule([
+                                'exists:users,id'
+                            ])
+                            ->visible(fn($get) => $get('role') == 'Driver'),
+
+                        Toggle::make('is_admin')
+                            ->helperText('Marking account as admin enable user to access this control panel.')
+                            ->label('Mark it as admin?'),
+
+                    ]),
+                ]),
+
             ]);
     }
 

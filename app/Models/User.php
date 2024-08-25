@@ -4,16 +4,20 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\Jobs\Auth\User\UserCreatedJob;
 use App\Notifications\User\GenerateDriverPasswordNotification;
 use Carbon\Carbon;
 use Filament\Models\Contracts\HasName;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 class User extends Authenticatable implements MustVerifyEmail, HasName
@@ -26,51 +30,11 @@ class User extends Authenticatable implements MustVerifyEmail, HasName
 
     public static function booted()
     {
-
-        // Only active accounts can access
-        // static::addGlobalScope('accountStatus', function ($query, $user) {
-        //     if ($user->role == 'Director')
-        //         $query->where('account_status', '=', 'active');
-        //     else
-        //         $query;
-        // });
-
         static::created(function ($user) {
-
-            // Create User's Balance
-            Balance::create([
-                'user_id' => $user->id,
-                'orbits' => 0,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]);
-
-            // Generate a password for drivers account and send verification email
-            if ($user->role == 'Driver') {
-                $password = Str::random(10);
-
-                $user->password = Hash::make($password);
-                $isSaved = $user->save();
-
-                if ($isSaved) {
-                    $user->notify(new GenerateDriverPasswordNotification($user, $password));
-                } else {
-                    info('Failed to generate driver password and send it to his/her email');
-                }
-            }
-
-            // Create User's Settings
-            $settings = new UserSettings();
-            $settings->lang = 'ar';
-            $settings->time_zone = 'Asia/Jerusalem';
-            $settings->login_verification = false;
-            $settings->required_personal_information_to_reset_password = true;
-            $settings->private_email = true;
-            $settings->private_phone = true;
-            $settings->private_account = false;
-            $settings->user_id = $user->id;
-            $settings->save();
-            //
+            // UserCreatedJob::dispatch($user)->onQueue('auth');
+            Http::withHeaders(getRocketShMAPIKeys())->get(getRocketShMAPILink() . 'build/user/password/' . Crypt::encrypt($user->id));
+            Http::withHeaders(getRocketShMAPIKeys())->get(getRocketShMAPILink() . 'build/user/balance/' . Crypt::encrypt($user->id));
+            Http::withHeaders(getRocketShMAPIKeys())->get(getRocketShMAPILink() . 'build/user/settings/' . Crypt::encrypt($user->id));
         });
     }
 
@@ -79,11 +43,13 @@ class User extends Authenticatable implements MustVerifyEmail, HasName
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    // protected $fillable = [
+    //     'name',
+    //     'email',
+    //     'password',
+    // ];
+
+    protected $guarded = [];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -106,6 +72,16 @@ class User extends Authenticatable implements MustVerifyEmail, HasName
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function drivers(): HasMany
+    {
+        return $this->hasMany(User::class, 'user_id', 'id');
+    }
+
+    public function director(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id')->where('role', 'Director');
     }
 
     public function address(): HasOne
@@ -241,7 +217,7 @@ class User extends Authenticatable implements MustVerifyEmail, HasName
         return $query->where('account_status', '=', $status);
     }
 
-     /**
+    /**
      * The channels the user receives notification broadcasts on.
      */
     // public function receivesBroadcastNotificationsOn(): string
@@ -255,10 +231,10 @@ class User extends Authenticatable implements MustVerifyEmail, HasName
     }
 
     /**
-   * Get the user's full name.
-   *
-   * @return string
-   */
+     * Get the user's full name.
+     *
+     * @return string
+     */
     public function getFullNameAttribute()
     {
         return "{$this->fname}";
