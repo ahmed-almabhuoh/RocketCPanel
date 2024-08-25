@@ -243,7 +243,7 @@ class User extends Authenticatable implements MustVerifyEmail, HasName
 
     public function canAccessPanel(Panel $panel): bool
     {
-        // return str_ends_with($this->email, '@yourdomain.com') && $this->hasVerifiedEmail();
-        return str_ends_with($this->email, '@hophearts.com') && $this->hasVerifiedEmail();
+        // return str_ends_with($this->email, '@hophearts.com') && $this->hasVerifiedEmail();
+        return true;
     }
 }
