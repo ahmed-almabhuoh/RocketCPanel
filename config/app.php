@@ -54,6 +54,10 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'rocket_shm_dashboard_production' => env('ROCKET_SHM__DASHBOARD_LINK_PRODUCTION', 'https://rocket-shm-cp.hophearts.com/u'),
+
+    'rocket_shm_dashboard_localhost' => env('ROCKET_SHM__DASHBOARD_LINK_LOCALHOST', 'http://127.0.0.1:8080/u'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

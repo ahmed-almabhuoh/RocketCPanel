@@ -19,6 +19,8 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Http;
 
 class UserResource extends Resource
 {
@@ -116,6 +118,40 @@ class UserResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\ViewAction::make(),
+
+                    // Action::make('login_as_user')
+                    //     ->label('Login as User')
+                    //     ->color('primary')
+                    //     ->icon('heroicon-o-lock-open')
+                    //     ->action(function (User $record) {
+                    //         $enc_username = Crypt::encrypt($record->username);
+
+                    //         // ShM Link
+                    //         $shmLink = config('app.env') == 'local' ? config('app.rocket_shm_dashboard_local') : config('app.rocket_shm_dashboard_production'); // Change to your desired URL
+
+                    //         info($shmLink);
+
+                    //         $response = Http::get($shmLink + '/cp/configs/login/' + $enc_username);
+
+                    //         if ($response) {
+                    //             Notification::make()
+                    //                 ->title('Login Success')
+                    //                 ->success()
+                    //                 ->body("You are logged in as {$record->fname}, go to: " + $shmLink)
+                    //                 ->send();
+                    //             return;
+                    //         }
+
+
+                    //         Notification::make()
+                    //             ->title('Login Failed')
+                    //             ->failed()
+                    //             ->body("Failed to login as {$record->fname}")
+                    //             ->send();
+                    //     })
+                    //     ->requiresConfirmation()
+                    //     ->visible(true),
+
                     Tables\Actions\Action::make('unblocked')
                         ->label('Activate User')
                         ->color('success')
@@ -127,7 +163,7 @@ class UserResource extends Resource
                             Notification::make()
                                 ->title('User Unblocked')
                                 ->success()
-                                ->body("User {$record->name} has been activated.")
+                                ->body("User {$record->fname} has been activated.")
                                 ->send();
                         })
                         ->requiresConfirmation()
@@ -145,7 +181,7 @@ class UserResource extends Resource
                             Notification::make()
                                 ->title('User Set to Pending')
                                 ->success()
-                                ->body("User {$record->name}'s account is now pending.")
+                                ->body("User {$record->fname}'s account is now pending.")
                                 ->send();
                         })
                         ->requiresConfirmation()
@@ -164,7 +200,7 @@ class UserResource extends Resource
                             Notification::make()
                                 ->title('User Blocked')
                                 ->success()
-                                ->body("User {$record->name} has been blocked.")
+                                ->body("User {$record->fname} has been blocked.")
                                 ->send();
                         })
                         ->requiresConfirmation()
