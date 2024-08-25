@@ -6,6 +6,11 @@ use App\Filament\Resources\ApiIntegrationResource\Pages;
 use App\Filament\Resources\ApiIntegrationResource\RelationManagers;
 use App\Models\ApiIntegration;
 use Filament\Forms;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -15,6 +20,8 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class ApiIntegrationResource extends Resource
 {
@@ -33,6 +40,65 @@ class ApiIntegrationResource extends Resource
         return $form
             ->schema([
                 //
+                Group::make()->schema([
+                    Section::make('General')->schema([
+
+                        TextInput::make('project_name')
+                            ->label('Project name')
+                            ->required()
+                            ->unique()
+                            ->columnSpan(1),
+
+                        TextInput::make('project_version')
+                            ->label('Project version')
+                            ->nullable()
+                            ->columnSpan(1),
+
+                        MarkdownEditor::make('project_description')
+                            ->label('Project description')
+                            ->nullable()
+                            ->columnSpan('full'),
+
+                    ])->columns(2),
+                ]),
+
+
+                Group::make()->schema([
+
+                    Section::make('API Key')->schema([
+
+                        TextInput::make('public_key')
+                            ->label('Public key')
+                            ->required()
+                            ->unique()
+                            ->default(fn() => (string) Str::uuid()),
+
+                        TextInput::make('secret_key')
+                            ->label('Secret key')
+                            ->required()
+                            ->dehydrateStateUsing(fn($state) => Hash::make($state)) // Hash the key before saving
+                            ->visibleOn(['create'])
+                            ->helperText('The secret key will be hashed before saving.')
+                            ->default(fn() => Str::random(64)),
+
+                    ]),
+
+                    Section::make('API Key Configuration')->schema([
+
+                        Toggle::make('is_limited_usage')
+                            ->label('Limited usage?')
+                            ->helperText('Make API key is limited to use')
+                            ->reactive(),
+
+                        TextInput::make('limited_usage_times')
+                            ->label('Usage times')
+                            ->nullable()
+                            ->numeric()
+                            ->minValue(100)
+                            ->visible(fn($get) => $get('is_limited_usage')),
+
+                    ]),
+                ]),
             ]);
     }
 
