@@ -116,6 +116,23 @@ class UserResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\ViewAction::make(),
+                    Tables\Actions\Action::make('unblocked')
+                        ->label('Unblocked User')
+                        ->color('success')
+                        ->icon('heroicon-o-lock-open')
+                        ->action(function (User $record) {
+                            $record->account_status = 'active';
+                            $record->save();
+
+                            Notification::make()
+                                ->title('User Unblocked')
+                                ->success()
+                                ->body("User {$record->name} has been activated.")
+                                ->send();
+                        })
+                        ->requiresConfirmation()
+                        ->visible(fn(User $record) => $record->account_status != 'active'),
+
 
                     Tables\Actions\DeleteAction::make(),
                     Tables\Actions\Action::make('block')
