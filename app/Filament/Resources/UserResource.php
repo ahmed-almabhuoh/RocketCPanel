@@ -132,7 +132,8 @@ class UserResource extends Resource
                                 ->body("User {$record->name} has been blocked.")
                                 ->send();
                         })
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->visible(fn(User $record) => $record->account_status != 'inactive'),
                 ]),
 
             ])
