@@ -117,7 +117,7 @@ class UserResource extends Resource
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\Action::make('unblocked')
-                        ->label('Unblocked User')
+                        ->label('Activate User')
                         ->color('success')
                         ->icon('heroicon-o-lock-open')
                         ->action(function (User $record) {
@@ -131,7 +131,7 @@ class UserResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation()
-                        ->visible(fn(User $record) => $record->account_status != 'active'),
+                        ->visible(fn(User $record) => ($record->account_status == 'inactive' || $record->account_status == 'pending')),
 
 
                     Tables\Actions\Action::make('pending')
@@ -149,7 +149,7 @@ class UserResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation()
-                        ->visible(fn(User $record) => $record->account_status != 'pending'),
+                        ->visible(fn(User $record) => ($record->account_status == 'active' || $record->account_status == 'inactive')),
 
 
                     Tables\Actions\DeleteAction::make(),
@@ -168,7 +168,7 @@ class UserResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation()
-                        ->visible(fn(User $record) => $record->account_status != 'inactive'),
+                        ->visible(fn(User $record) => ($record->account_status == 'inactive' || $record->account_status == 'pending')),
                 ]),
 
             ])
