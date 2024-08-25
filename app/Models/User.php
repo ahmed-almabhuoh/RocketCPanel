@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Jobs\Auth\User\UserCreatedJob;
 use App\Notifications\User\GenerateDriverPasswordNotification;
 use Carbon\Carbon;
+use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -21,9 +22,15 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
-class User extends Authenticatable implements MustVerifyEmail, HasName
+class User extends Authenticatable implements MustVerifyEmail, HasName, FilamentUser
 {
     use HasFactory, Notifiable;
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        // return str_ends_with($this->email, '@hophearts.com') && $this->hasVerifiedEmail();
+        return true;
+    }
 
     const ROLES = ['Customer', 'Director', 'Driver'];
 
@@ -239,11 +246,5 @@ class User extends Authenticatable implements MustVerifyEmail, HasName
     public function getFullNameAttribute()
     {
         return "{$this->fname}";
-    }
-
-    public function canAccessPanel(Panel $panel): bool
-    {
-        // return str_ends_with($this->email, '@hophearts.com') && $this->hasVerifiedEmail();
-        return true;
     }
 }
