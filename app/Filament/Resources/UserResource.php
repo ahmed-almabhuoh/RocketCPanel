@@ -9,6 +9,7 @@ use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
@@ -114,8 +115,24 @@ class UserResource extends Resource
 
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
                     Tables\Actions\ViewAction::make(),
+
+                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\Action::make('block')
+                        ->label('Block User')
+                        ->color('danger')
+                        ->icon('heroicon-o-lock-closed')
+                        ->action(function (User $record) {
+                            $record->account_status = 'inactive';
+                            $record->save();
+
+                            Notification::make()
+                                ->title('User Blocked')
+                                ->success()
+                                ->body("User {$record->name} has been blocked.")
+                                ->send();
+                        })
+                        ->requiresConfirmation(),
                 ]),
 
             ])
