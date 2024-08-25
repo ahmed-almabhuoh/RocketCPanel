@@ -134,6 +134,24 @@ class UserResource extends Resource
                         ->visible(fn(User $record) => $record->account_status != 'active'),
 
 
+                    Tables\Actions\Action::make('pending')
+                        ->label('Set Pending')
+                        ->color('warning')
+                        ->icon('heroicon-o-clock')
+                        ->action(function (User $record) {
+                            $record->account_status = 'pending';
+                            $record->save();
+
+                            Notification::make()
+                                ->title('User Set to Pending')
+                                ->success()
+                                ->body("User {$record->name}'s account is now pending.")
+                                ->send();
+                        })
+                        ->requiresConfirmation()
+                        ->visible(fn(User $record) => $record->account_status != 'pending'),
+
+
                     Tables\Actions\DeleteAction::make(),
                     Tables\Actions\Action::make('block')
                         ->label('Block User')
