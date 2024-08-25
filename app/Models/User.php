@@ -28,8 +28,7 @@ class User extends Authenticatable implements MustVerifyEmail, HasName, Filament
 
     public function canAccessPanel(Panel $panel): bool
     {
-        // return str_ends_with($this->email, '@hophearts.com') && $this->hasVerifiedEmail();
-        return true;
+        return $this->hasVerifiedEmail();
     }
 
     const ROLES = ['Customer', 'Director', 'Driver'];
