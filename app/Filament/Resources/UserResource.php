@@ -94,11 +94,19 @@ class UserResource extends Resource
                     ])
                     ->default(false),
 
+                SelectFilter::make('account_status')
+                    ->label('Account Status')
+                    ->options([
+                        'active' => 'Active accounts',
+                        'inactive' => 'Blocked accounts',
+                        'pending' => 'Pending accounts',
+                    ]),
+
                 Filter::make('email_verified_at')
                     ->label('Verified Account')
                     ->toggle() // Adds a toggle button for the filter
                     ->default(true)
-                    ->query(fn ($query) => $query->whereNotNull('email_verified_at')),
+                    ->query(fn($query) => $query->whereNotNull('email_verified_at')),
 
 
             ])
