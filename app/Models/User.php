@@ -39,9 +39,15 @@ class User extends Authenticatable implements MustVerifyEmail, HasName, Filament
     {
         static::created(function ($user) {
             // UserCreatedJob::dispatch($user)->onQueue('auth');
-            Http::withHeaders(getRocketShMAPIKeys())->get(getRocketShMAPILink() . 'build/user/password/' . Crypt::encrypt($user->id));
-            Http::withHeaders(getRocketShMAPIKeys())->get(getRocketShMAPILink() . 'build/user/balance/' . Crypt::encrypt($user->id));
-            Http::withHeaders(getRocketShMAPIKeys())->get(getRocketShMAPILink() . 'build/user/settings/' . Crypt::encrypt($user->id));
+            $response = Http::withHeaders(getRocketShMAPIKeys())->get(getRocketShMAPILink() . 'build/user/password/' . Crypt::encrypt($user->id));
+            info($response);
+
+            $response = Http::withHeaders(getRocketShMAPIKeys())->get(getRocketShMAPILink() . 'build/user/balance/' . Crypt::encrypt($user->id));
+            info($response);
+
+            $response = Http::withHeaders(getRocketShMAPIKeys())->get(getRocketShMAPILink() . 'build/user/settings/' . Crypt::encrypt($user->id));
+            info($response);
+
         });
     }
 
