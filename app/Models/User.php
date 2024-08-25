@@ -42,21 +42,21 @@ class User extends Authenticatable implements MustVerifyEmail, HasName, Filament
             $response = Http::withHeaders([
                 'public' => env('CONTROL_PANEL_PUBLIC_KEY'),
                 'secret' => env('CONTROL_PANEL_PRIVATE_KEY')
-            ])->get(env('ROCKET_SHM__DASHBOARD_LINK_PRODUCTION') . 'build/user/password/' . Crypt::encrypt($user->id));
+            ])->get(env('ROCKET_SHM__DASHBOARD_LINK_PRODUCTION') . 'api/build/user/password/' . Crypt::encrypt($user->id));
 
             info($response);
 
             $response = Http::withHeaders([
                 'public' => env('CONTROL_PANEL_PUBLIC_KEY'),
                 'secret' => env('CONTROL_PANEL_PRIVATE_KEY')
-            ])->get(env('ROCKET_SHM__DASHBOARD_LINK_PRODUCTION') . 'build/user/balance/' . Crypt::encrypt($user->id));
+            ])->get(env('ROCKET_SHM__DASHBOARD_LINK_PRODUCTION') . 'api/build/user/balance/' . Crypt::encrypt($user->id));
             info($response);
 
 
             $response = Http::withHeaders([
                 'public' => env('CONTROL_PANEL_PUBLIC_KEY'),
                 'secret' => env('CONTROL_PANEL_PRIVATE_KEY')
-            ])->get(env('ROCKET_SHM__DASHBOARD_LINK_PRODUCTION') . 'build/user/settings/' . Crypt::encrypt($user->id));
+            ])->get(env('ROCKET_SHM__DASHBOARD_LINK_PRODUCTION') . 'api/build/user/settings/' . Crypt::encrypt($user->id));
             info($response);
         });
     }
