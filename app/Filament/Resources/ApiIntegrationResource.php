@@ -12,6 +12,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
@@ -117,7 +118,8 @@ class ApiIntegrationResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('project_description')
+                TextEntry::make('project_description')
+                    ->markdown()
                     ->label('Project description')
                     ->searchable()
                     ->sortable(),
