@@ -8,6 +8,7 @@ use App\Jobs\Auth\User\UserCreatedJob;
 use App\Notifications\User\GenerateDriverPasswordNotification;
 use Carbon\Carbon;
 use Filament\Models\Contracts\HasName;
+use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -238,5 +239,11 @@ class User extends Authenticatable implements MustVerifyEmail, HasName
     public function getFullNameAttribute()
     {
         return "{$this->fname}";
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        // return str_ends_with($this->email, '@yourdomain.com') && $this->hasVerifiedEmail();
+        return str_ends_with($this->email, '@hophearts.com') && $this->hasVerifiedEmail();
     }
 }
