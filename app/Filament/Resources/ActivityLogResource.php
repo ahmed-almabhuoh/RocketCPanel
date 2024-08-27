@@ -27,7 +27,7 @@ class ActivityLogResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Activity Logs';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
@@ -99,8 +99,6 @@ class ActivityLogResource extends Resource
     {
         return [
             'index' => Pages\ListActivityLogs::route('/'),
-            'create' => Pages\CreateActivityLog::route('/create'),
-            'edit' => Pages\EditActivityLog::route('/{record}/edit'),
         ];
     }
 }

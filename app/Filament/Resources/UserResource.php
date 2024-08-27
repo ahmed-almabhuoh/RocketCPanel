@@ -3,11 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
-use Filament\Actions\Action;
-use Filament\Actions\ActionGroup;
-use Filament\Forms;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -22,10 +18,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 class UserResource extends Resource
@@ -151,8 +143,8 @@ class UserResource extends Resource
                 IconColumn::make('account_status')
                     ->label('Account Status')
                     ->boolean()
-                    ->trueIcon('heroicon-o-check-circle') // Icon for 'active' status
-                    ->falseIcon('heroicon-o-x-circle')    // Icon for other statuses
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
                     ->getStateUsing(fn($record) => $record->account_status === 'active'),
 
                 IconColumn::make('is_admin')
