@@ -27,7 +27,7 @@ class BadgesResource extends Resource
 {
     protected static ?string $model = Badges::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-check-badge';
 
     protected static ?string $navigationGroup = 'Content Management - CM -';
 
