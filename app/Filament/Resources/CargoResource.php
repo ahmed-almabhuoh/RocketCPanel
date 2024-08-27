@@ -15,6 +15,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class CargoResource extends Resource
@@ -230,6 +232,19 @@ class CargoResource extends Resource
             ])
             ->filters([
                 //
+
+                SelectFilter::make('status')
+                    ->options(returnWithKeyValuesArray(Cargo::STATUS)),
+
+                SelectFilter::make('weight_unite')
+                    ->options([
+                        'kg' => 'KG - Kilo Gram',
+                        'ton' => 'Ton'
+                    ]),
+
+                SelectFilter::make('type')
+                    ->options(returnWithKeyValuesArray(Cargo::TYPE)),
+
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
