@@ -12,6 +12,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -251,6 +252,59 @@ class CargoResource extends Resource
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\DeleteAction::make(),
+
+                    Tables\Actions\Action::make('pending status')
+                        ->label('Mark as pending cargo')
+                        ->color('warning')
+                        ->icon('heroicon-o-clock')
+                        ->requiresConfirmation()
+                        ->action(function (Cargo $record) {
+                            $record->status = 'pending';
+                            $record->save();
+
+                            Notification::make()
+                                ->title('Pending Cargo')
+                                ->success()
+                                ->body("Cargo {$record->name} has been marked as pending.")
+                                ->send();
+                        })
+                        ->visible(fn(Cargo $record) => $record->status != 'pending'),
+
+
+                    Tables\Actions\Action::make('shipped status')
+                        ->label('Mark as shipped cargo')
+                        ->color('success')
+                        ->icon('heroicon-o-lock-open')
+                        ->requiresConfirmation()
+                        ->action(function (Cargo $record) {
+                            $record->status = 'shipped';
+                            $record->save();
+
+                            Notification::make()
+                                ->title('Shipped Cargo')
+                                ->success()
+                                ->body("Cargo {$record->name} has been marked as shipped.")
+                                ->send();
+                        })
+                        ->visible(fn(Cargo $record) => $record->status != 'shipped'),
+
+                    Tables\Actions\Action::make('delivered status')
+                        ->label('Mark as delivered cargo')
+                        ->color('success')
+                        ->icon('heroicon-o-lock-open')
+                        ->requiresConfirmation()
+                        ->action(function (Cargo $record) {
+                            $record->status = 'delivered';
+                            $record->save();
+
+                            Notification::make()
+                                ->title('Delivered Cargo')
+                                ->success()
+                                ->body("Cargo {$record->name} has been marked as delivered.")
+                                ->send();
+                        })
+                        ->visible(fn(Cargo $record) => $record->status != 'delivered'),
+
                 ]),
             ])
             ->bulkActions([
