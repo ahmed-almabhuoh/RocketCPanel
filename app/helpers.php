@@ -17,3 +17,15 @@ if (! function_exists('getRocketShMAPILink')) {
         return $env_link . 'api/';
     }
 }
+
+if (! function_exists('returnWithKeyValuesArray')) {
+    function returnWithKeyValuesArray(array $array): array
+    {
+        $casted = [];
+
+        foreach ($array as $key => $value) {
+            $casted[lcfirst($value)] = __(ucfirst($value));
+        }
+        return $casted;
+    }
+}

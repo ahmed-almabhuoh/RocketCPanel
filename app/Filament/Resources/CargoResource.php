@@ -3,25 +3,19 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CargoResource\Pages;
-use App\Filament\Resources\CargoResource\RelationManagers;
 use App\Models\Cargo;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\Group;
-use Filament\Forms\Components\Livewire;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
 use Filament\Resources\Resource;
-use Filament\Support\Markdown;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CargoResource extends Resource
 {
@@ -35,42 +29,59 @@ class CargoResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-
-
     public static function form(Form $form): Form
     {
-        $volume = 1;
-
         return $form
             ->schema([
-                //
-
                 Group::make()->schema([
                     Section::make()->schema([
-
                         TextInput::make('name')
                             ->label('Cargo name')
                             ->required()
                             ->minValue(2)
                             ->maxValue(50),
 
-
                         MarkdownEditor::make('description')
                             ->label('Cargo description'),
                     ]),
-                ]),
 
+                    Section::make('Cargo Configuration')->schema([
+
+                        Select::make('type')
+                            ->label('Cargo type')
+                            ->required()
+                            ->options(returnWithKeyValuesArray(Cargo::TYPE))
+                            ->in(implode(',', Cargo::TYPE))
+                            ->columnSpan(1),
+
+                        Select::make('status')
+                            ->label('Cargo status')
+                            ->required()
+                            ->options(returnWithKeyValuesArray(Cargo::STATUS))
+                            ->in(implode(',', Cargo::STATUS))
+                            ->columnSpan(1),
+
+
+                        Select::make('customer_id')
+                            ->label('For customer')
+                            ->relationship('customer', 'fname')
+                            ->required()
+                            ->exists('users', 'id')
+                            ->getOptionLabelFromRecordUsing(fn($record) => $record->fname . ' ' . $record->lname)
+                            ->columnSpan(2),
+
+                    ])->columns(2),
+
+                ]),
 
                 Group::make()->schema([
                     Section::make('Dimensions & Weight')->schema([
-
                         TextInput::make('weight')
                             ->label('Cargo weight')
                             ->helperText('Take care about weight unit.')
                             ->required()
                             ->minValue(1)
                             ->columnSpan(1),
-
 
                         Select::make('weight_unit')
                             ->label('Weight unit')
@@ -82,12 +93,15 @@ class CargoResource extends Resource
                             ->required()
                             ->columnSpan(2),
 
-
                         TextInput::make('width')
                             ->label('Cargo width')
                             ->helperText('In M - Meter')
                             ->required()
                             ->minValue(1)
+                            ->reactive()
+                            ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get) {
+                                self::calculateVolume($set, $get);
+                            })
                             ->columnSpan(1),
 
                         TextInput::make('height')
@@ -95,6 +109,10 @@ class CargoResource extends Resource
                             ->helperText('In M - Meter')
                             ->required()
                             ->minValue(1)
+                            ->reactive()
+                            ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get) {
+                                self::calculateVolume($set, $get);
+                            })
                             ->columnSpan(1),
 
                         TextInput::make('length')
@@ -102,6 +120,10 @@ class CargoResource extends Resource
                             ->helperText('In M - Meter')
                             ->required()
                             ->minValue(1)
+                            ->reactive()
+                            ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get) {
+                                self::calculateVolume($set, $get);
+                            })
                             ->columnSpan(1),
 
                         TextInput::make('volume')
@@ -109,7 +131,6 @@ class CargoResource extends Resource
                             ->helperText('In M3 - Meter³')
                             ->required()
                             ->disabled()
-                            ->dehydrated()
                             ->columnSpan(3),
 
                     ])->columns(3)->collapsible(),
@@ -118,74 +139,68 @@ class CargoResource extends Resource
             ]);
     }
 
+    protected static function calculateVolume(Forms\Set $set, Forms\Get $get)
+    {
+        $width = $get('width');
+        $height = $get('height');
+        $length = $get('length');
+
+        if ($width && $height && $length) {
+            $set('volume', $width * $height * $length);
+        }
+    }
+
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                //
-
                 TextColumn::make('name')
                     ->label('Name')
                     ->sortable()
                     ->searchable()
                     ->limit(35)
-                    ->wrap()
-                    ->extraAttributes([
-                        'style' => 'width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;',
-                    ]),
+                    ->wrap(),
 
                 TextColumn::make('description')
                     ->label('Description')
                     ->sortable()
                     ->searchable()
+                    ->markdown()
                     ->limit(35)
-                    ->wrap()
-                    ->extraAttributes([
-                        'style' => 'width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;',
-                    ]),
+                    ->wrap(),
 
                 TextColumn::make('weight')
                     ->label('Weight')
                     ->sortable()
                     ->searchable()
-                    ->formatStateUsing(function ($record) {
-                        return $record->weight . ' ' . $record->weight_unit;
-                    }),
+                    ->formatStateUsing(fn($record) => $record->weight . ' ' . $record->weight_unit),
 
                 TextColumn::make('width')
                     ->label('Width')
                     ->sortable()
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->formatStateUsing(function ($record) {
-                        return $record->width . ' M';
-                    }),
+                    ->formatStateUsing(fn($record) => $record->width . ' M'),
 
                 TextColumn::make('height')
                     ->label('Height')
                     ->sortable()
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->formatStateUsing(function ($record) {
-                        return $record->height . ' M';
-                    }),
+                    ->formatStateUsing(fn($record) => $record->height . ' M'),
 
                 TextColumn::make('length')
                     ->label('Length')
                     ->sortable()
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->formatStateUsing(function ($record) {
-                        return $record->length . ' M';
-                    }),
+                    ->formatStateUsing(fn($record) => $record->length . ' M'),
 
                 TextColumn::make('volume')
                     ->label('Volume')
                     ->sortable()
                     ->searchable()
-                    ->formatStateUsing(function ($record) {
-                        return $record->length . ' M3';
-                    }),
+                    ->formatStateUsing(fn($record) => $record->volume . ' M3'),
 
                 TextColumn::make('status')
                     ->label('Shipping status')
@@ -201,12 +216,7 @@ class CargoResource extends Resource
                     ->label('Customer')
                     ->sortable()
                     ->searchable()
-                    ->formatStateUsing(function ($record) {
-                        return $record->customer->fname . ' ' . $record->customer->lname;
-                    })
-                    ->action(function ($record) {
-                        // return redirect()->route('filament.resources.users.edit', $record->customer->id);
-                    }),
+                    ->formatStateUsing(fn($record) => $record->customer->fname . ' ' . $record->customer->lname),
 
                 TextColumn::make('created_at')
                     ->label('Added at')
@@ -222,13 +232,11 @@ class CargoResource extends Resource
                 //
             ])
             ->actions([
-
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\DeleteAction::make(),
                 ]),
-
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
