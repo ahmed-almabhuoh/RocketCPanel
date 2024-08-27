@@ -194,7 +194,7 @@ class UserResource extends Resource
 
                 Filter::make('email_verified_at')
                     ->label('Verified Account')
-                    ->toggle() // Adds a toggle button for the filter
+                    ->toggle()
                     ->default(true)
                     ->query(fn($query) => $query->whereNotNull('email_verified_at')),
 
