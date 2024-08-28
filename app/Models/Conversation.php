@@ -17,10 +17,11 @@ class Conversation extends Model
     ];
 
     // Functions
-    public function getReceiver () {
+    public function getReceiver()
+    {
         if ($this->sender_id == auth()->id()) {
             return User::firstWhere('id', $this->receiver_id);
-        }else {
+        } else {
             return User::firstWhere('id', $this->sender_id);
         }
     }
@@ -39,5 +40,10 @@ class Conversation extends Model
     public function receiver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'receiver_id');
+    }
+
+    public function getIsDeletedAttribute()
+    {
+        return !is_null($this->deleted_at);
     }
 }
