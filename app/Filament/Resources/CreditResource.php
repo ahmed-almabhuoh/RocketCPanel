@@ -16,6 +16,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -202,6 +203,11 @@ class CreditResource extends Resource
                         'deposit' => 'Deposit',
                         'withdraw' => 'Withdraw',
                     ]),
+
+                Filter::make('reason')
+                    ->label('By admins')
+                    ->toggle()
+                    ->query(fn($query) => $query->whereNotNull('reason')),
 
             ])
             ->actions([
