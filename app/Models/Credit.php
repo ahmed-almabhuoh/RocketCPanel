@@ -6,6 +6,8 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Http;
 
 class Credit extends Model
 {
@@ -25,7 +27,9 @@ class Credit extends Model
     ];
 
     const TYPE = [
-        'withdraw', 'deposit', 'transfer'
+        'withdraw',
+        'deposit',
+        'transfer'
     ];
 
     public static function booted()
@@ -44,27 +48,17 @@ class Credit extends Model
         // });
 
 
-        // static::created(function ($credit) {
+        static::created(function ($credit) {
 
-        //     // Update Transaction Status
-        //     if ($credit->transaction_id) {
-        //         Transaction::where('id', $credit->transaction_id)->update([
-        //             'status' => 'approved',
-        //             'updated_at' => Carbon::now(),
-        //         ]);
+            // Update User Balance
+            $response = Http::withHeaders([
+                'public' => env('CONTROL_PANEL_PUBLIC_KEY'),
+                'secret' => env('CONTROL_PANEL_PRIVATE_KEY'),
+                'Accept' => 'application/json',
+            ])->get(env('ROCKET_SHM__DASHBOARD_LINK_PRODUCTION') . 'api/build/user/config/update-balance/' . Crypt::encrypt($credit->id));
 
-        //         // Update Balance
-        //         $transaction = $credit->transaction()->first();
-        //         if ($transaction->status == 'approved') {
-        //             // Update User Balance
-        //             updateUserBalance($transaction->orbits, $transaction->user_id);
-        //         }
-        //         return;
-        //     }
-
-        //     // Update User Balance
-        //     updateUserBalance($credit->credits, $credit->user_id, $credit->type);
-        // });
+            info($response);
+        });
     }
 
     public function user(): BelongsTo
