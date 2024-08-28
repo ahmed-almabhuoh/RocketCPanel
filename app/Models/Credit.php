@@ -19,6 +19,7 @@ class Credit extends Model
         'user_id',
         'balance_id',
         'transaction_id',
+        'reason',
         'created_at',
         'updated_at',
     ];
@@ -30,40 +31,40 @@ class Credit extends Model
     public static function booted()
     {
 
-        static::creating(function ($credit) {
+        // static::creating(function ($credit) {
 
 
-            // Update Transaction Status
-            if ($credit->transaction_id) {
-                Transaction::where('id', $credit->transaction_id)->update([
-                    'status' => 'waiting',
-                    'updated_at' => Carbon::now(),
-                ]);
-            }
-        });
+        //     // Update Transaction Status
+        //     if ($credit->transaction_id) {
+        //         Transaction::where('id', $credit->transaction_id)->update([
+        //             'status' => 'waiting',
+        //             'updated_at' => Carbon::now(),
+        //         ]);
+        //     }
+        // });
 
 
-        static::created(function ($credit) {
+        // static::created(function ($credit) {
 
-            // Update Transaction Status
-            if ($credit->transaction_id) {
-                Transaction::where('id', $credit->transaction_id)->update([
-                    'status' => 'approved',
-                    'updated_at' => Carbon::now(),
-                ]);
+        //     // Update Transaction Status
+        //     if ($credit->transaction_id) {
+        //         Transaction::where('id', $credit->transaction_id)->update([
+        //             'status' => 'approved',
+        //             'updated_at' => Carbon::now(),
+        //         ]);
 
-                // Update Balance
-                $transaction = $credit->transaction()->first();
-                if ($transaction->status == 'approved') {
-                    // Update User Balance
-                    updateUserBalance($transaction->orbits, $transaction->user_id);
-                }
-                return;
-            }
+        //         // Update Balance
+        //         $transaction = $credit->transaction()->first();
+        //         if ($transaction->status == 'approved') {
+        //             // Update User Balance
+        //             updateUserBalance($transaction->orbits, $transaction->user_id);
+        //         }
+        //         return;
+        //     }
 
-            // Update User Balance
-            updateUserBalance($credit->credits, $credit->user_id, $credit->type);
-        });
+        //     // Update User Balance
+        //     updateUserBalance($credit->credits, $credit->user_id, $credit->type);
+        // });
     }
 
     public function user(): BelongsTo
