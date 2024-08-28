@@ -6,6 +6,11 @@ use App\Filament\Resources\CompanyResource\Pages;
 use App\Filament\Resources\CompanyResource\RelationManagers;
 use App\Models\Company;
 use Filament\Forms;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -32,6 +37,97 @@ class CompanyResource extends Resource
         return $form
             ->schema([
                 //
+
+                Group::make()->schema([
+                    Section::make('Details Information')->schema([
+
+                        TextInput::make('name')
+                            ->label('Company name')
+                            ->required()
+                            ->minValue(2)
+                            ->maxValue(50),
+
+                        TextInput::make('email')
+                            ->label('Company E-mail address')
+                            ->required()
+                            ->unique()
+                            ->email(),
+
+                        TextInput::make('phone')
+                            ->label('Company Phone No.')
+                            ->helperText('No. for Number')
+                            ->required()
+                            ->unique()
+                            ->regex('/^\+?[0-9\s\-()]*$/')
+                            ->maxLength(15),
+
+                        TextInput::make('website')
+                            ->label('Company Website')
+                            ->helperText('e.g. company.com')
+                            ->required()
+                            ->unique()
+                            ->regex('/^(https?:\/\/)?(www\.)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/\S*)?$/')
+                            ->maxLength(255),
+
+                        Select::make('director_id')
+                            ->relationship('director', 'fname')
+                            ->label('For director')
+                            ->getOptionLabelFromRecordUsing(function ($record) {
+                                return $record->fname . ' ' . $record->lname;
+                            })
+                            ->required()
+                            ->rule(['integer'])
+                            ->exists('users', 'id')
+                            ->columnSpan('full'),
+
+                        MarkdownEditor::make('description')
+                            ->label('Description about company')
+                            ->columnSpan('full'),
+
+                    ])->columns(2),
+                ]),
+
+                Group::make()->schema([
+                    Section::make('Location')->schema([
+
+                        TextInput::make('general_location')
+                            ->label('Location')
+                            ->required()
+                            ->minValue(2)
+                            ->maxValue(50),
+
+                        TextInput::make('breif_location')
+                            ->label('Detailed location'),
+
+                        Select::make('country')
+                            ->label('Country')
+                            ->options(config('countries'))
+                            ->required()
+                            ->in(returnWithKeyValuesArray(config('countries'), true)),
+
+                        TextInput::make('city')
+                            ->label('City')
+                            ->required()
+                            ->minValue(2)
+                            ->maxValue(50),
+
+                        TextInput::make('state')
+                            ->label('State')
+                            ->required()
+                            ->minValue(2)
+                            ->maxValue(50),
+
+                        TextInput::make('postcode')
+                            ->label('Postal code')
+                            ->required()
+                            ->minValue(2)
+                            ->maxValue(50)
+                            ->regex('/^[A-Za-z0-9\s\-]{2,50}$/')
+                            ->helperText('Enter a valid postal code (e.g., 12345, A1A 1A1, 123-4567)'),
+
+                    ])->columns(2),
+                ]),
+
             ]);
     }
 
@@ -107,6 +203,13 @@ class CompanyResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->formatStateUsing(fn($record) => ucfirst($record->general_location)),
+
+                TextColumn::make('description')
+                    ->label('About')
+                    ->markdown()
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('created_at')
                     ->label('Added at')

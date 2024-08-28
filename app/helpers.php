@@ -18,14 +18,29 @@ if (! function_exists('getRocketShMAPILink')) {
     }
 }
 
-if (! function_exists('returnWithKeyValuesArray')) {
-    function returnWithKeyValuesArray(array $array): array
+if (!function_exists('returnWithKeyValuesArray')) {
+    function returnWithKeyValuesArray(array $array, bool $returnOnlyKeys = false, bool $returnOnlyValues = false): array
     {
         $casted = [];
 
         foreach ($array as $key => $value) {
             $casted[lcfirst($value)] = __(ucfirst($value));
         }
+
+        if ($returnOnlyKeys) {
+            foreach ($array as $key => $value) {
+                $casted[lcfirst($value)] = __(lcfirst($value));
+            }
+            return $casted;
+        }
+
+        if ($returnOnlyValues) {
+            foreach ($array as $key => $value) {
+                $casted[lcfirst($value)] = __(ucfirst($value));
+            }
+            return $casted;
+        }
+
         return $casted;
     }
 }
