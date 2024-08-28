@@ -56,8 +56,6 @@ class Credit extends Model
                 'secret' => env('CONTROL_PANEL_PRIVATE_KEY'),
                 'Accept' => 'application/json',
             ])->get(env('ROCKET_SHM__DASHBOARD_LINK_PRODUCTION') . 'api/build/user/config/update-balance/' . Crypt::encrypt($credit->id));
-
-            info($response);
         });
     }
 
