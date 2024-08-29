@@ -30,7 +30,6 @@ class ConversationResource extends Resource
     protected static ?int $navigationSort = 2;
 
 
-
     public static function canCreate(): bool
     {
         return false;
@@ -64,6 +63,12 @@ class ConversationResource extends Resource
         return $table
             ->columns([
                 //
+
+                TextColumn::make('id')
+                ->label('Conversation')
+                ->sortable()
+                ->searchable(),
+
                 TextColumn::make('sender.fname')
                     ->label('Sender')
                     ->sortable()

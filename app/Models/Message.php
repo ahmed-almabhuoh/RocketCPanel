@@ -28,9 +28,35 @@ class Message extends Model
         return $this->read_at != null;
     }
 
+    // Attributes
+    public function getIsReadAttribute()
+    {
+        return !is_null($this->read_at);
+    }
+
+    public function getIsReceiverDeletedAttribute()
+    {
+        return !is_null($this->receiver_deleted_at);
+    }
+
+    public function getIsSenderDeletedAttribute()
+    {
+        return !is_null($this->sender_deleted_at);
+    }
+
     // Relations
     public function conversation(): BelongsTo
     {
         return $this->belongsTo(Conversation::class);
+    }
+
+    public function sender(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'sender_id');
+    }
+
+    public function receiver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'receiver_id');
     }
 }
