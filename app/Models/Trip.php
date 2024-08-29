@@ -55,20 +55,20 @@ class Trip extends Model
     public static function booted()
     {
         // Hide Blocked Trips
-        static::addGlobalScope('trips.blocking', function (Builder $query) {
-            $query->whereDoesntHave('blocks', function (Builder $query) {
-                $query->where('user_id', auth()->id());
-            });
-        });
+        // static::addGlobalScope('trips.blocking', function (Builder $query) {
+        //     $query->whereDoesntHave('blocks', function (Builder $query) {
+        //         $query->where('user_id', auth()->id());
+        //     });
+        // });
 
         // Hide Blocked Trips Depending On User
-        static::addGlobalScope('trips.block.director', function (Builder $query) {
-            $query->whereHas('director', function (Builder $query) {
-                $query->whereDoesntHave('blocks', function (Builder $query) {
-                    $query->where('blocker_id', auth()->id());
-                });
-            });
-        });
+        // static::addGlobalScope('trips.block.director', function (Builder $query) {
+        //     $query->whereHas('director', function (Builder $query) {
+        //         $query->whereDoesntHave('blocks', function (Builder $query) {
+        //             $query->where('blocker_id', auth()->id());
+        //         });
+        //     });
+        // });
 
         static::created(function ($trip) {
 
@@ -76,7 +76,7 @@ class Trip extends Model
             $trip->code = Str::uuid();
             $trip->save();
 
-            $user = Auth::user();
+            $user = User::where('id', $trip->director_id)->first();
             $userBalance = $user->balance;
 
             // Update User Balance
@@ -104,7 +104,7 @@ class Trip extends Model
             ]);
 
             // Config Blocked Trips - This should convert to queues when using redis
-            ConfigBlockedTripsJob::dispatch($trip->director)->onQueue('tripConfigs');
+            // ConfigBlockedTripsJob::dispatch($trip->director)->onQueue('tripConfigs');
         });
     }
 

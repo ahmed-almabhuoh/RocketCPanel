@@ -44,3 +44,10 @@ if (!function_exists('returnWithKeyValuesArray')) {
         return $casted;
     }
 }
+
+if (!function_exists('getCreditsLevel')) {
+    function getCreditsLevel($vehicleSize): int
+    {
+        return  $vehicleSize == 'big' ? 3 : ($vehicleSize == 'middle' ? 2 : 1);
+    }
+}
