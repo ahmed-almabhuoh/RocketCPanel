@@ -28,6 +28,10 @@ class Transaction extends Model
         'withdraw', 'deposit', 'transfer'
     ];
 
+    protected $casts = [
+        // 'method_meta' => 'array',
+    ];
+
     protected $guarded = [];
 
     public static function booted()
