@@ -2,33 +2,32 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\MessageResource\Pages;
-use App\Filament\Resources\MessageResource\RelationManagers;
-use App\Models\Message;
+use App\Filament\Resources\ProposalResource\Pages;
+use App\Filament\Resources\ProposalResource\RelationManagers;
+use App\Models\Proposal;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class MessageResource extends Resource
+class ProposalResource extends Resource
 {
-    protected static ?string $model = Message::class;
+    protected static ?string $model = Proposal::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
+    protected static ?string $navigationIcon = 'heroicon-o-identification';
 
-    protected static ?string $navigationGroup = 'Community';
+    protected static ?string $navigationGroup = 'Content Management - CM -';
 
-    protected static ?string $navigationLabel = 'Messages';
+    protected static ?string $navigationLabel = 'Proposals';
 
     protected static ?int $navigationSort = 2;
-
 
     public static function canCreate(): bool
     {
@@ -64,69 +63,51 @@ class MessageResource extends Resource
             ->columns([
                 //
 
-                TextColumn::make('sender.fname')
-                    ->label('Sender')
+                TextColumn::make('description')
+                    ->label('Proposal')
                     ->sortable()
-                    ->searchable()
-                    ->formatStateUsing(fn($record) => $record->sender->fname . ' ' . $record->sender->lname),
-
-                TextColumn::make('receiver.fname')
-                    ->label('Receiver')
-                    ->sortable()
-                    ->searchable()
-                    ->formatStateUsing(fn($record) => $record->receiver->fname . ' ' . $record->receiver->lname),
-
-                TextColumn::make('conversation.id')
-                    ->label('Conversation No.')
-                    ->sortable()
+                    ->markdown()
                     ->searchable(),
 
-                TextColumn::make('body')
-                    ->label('Message')
+                TextColumn::make('status')
+                    ->label('Proposal status')
                     ->sortable()
+                    ->markdown()
+                    ->formatStateUsing(fn($record) => ucfirst($record->status))
                     ->searchable(),
 
-                IconColumn::make('is_read')
-                    ->label('Is read?')
-                    ->boolean(),
 
-                IconColumn::make('is_receiver_deleted')
-                    ->label('Is receiver deleted?')
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->boolean(),
-
-                IconColumn::make('is_sender_deleted')
-                    ->label('Is sender deleted?')
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->boolean(),
-
-                TextColumn::make('read_at')
-                    ->label('Read at')
+                TextColumn::make('cargo.name')
+                    ->label('With cargo')
                     ->sortable()
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->markdown()
+                    ->searchable(),
 
-                TextColumn::make('receiver_deleted_at')
-                    ->label('Receiver deleted at')
+                TextColumn::make('customer.fname')
+                    ->label('Submitted by')
                     ->sortable()
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->markdown()
+                    ->formatStateUsing(fn($record) => $record->customer->fname . ' ' . $record->customer->lname)
+                    ->searchable(),
 
-                TextColumn::make('sender_deleted_at')
-                    ->label('Sender deleted at')
+                TextColumn::make('trip.from_city')
+                    ->label('On trip')
                     ->sortable()
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->markdown()
+                    ->formatStateUsing(fn($record) => $record->trip->from_city . ' - ' . $record->trip->to_city)
+                    ->searchable(),
 
                 TextColumn::make('created_at')
-                    ->label('Sent at')
-                    ->sortable()
-                    ->searchable()
+                    ->label('Added at')
+                    ->dateTime()
                     ->toggleable(isToggledHiddenByDefault: true),
+
             ])
             ->filters([
                 //
 
+                SelectFilter::make('status')
+                    ->options(returnWithKeyValuesArray(Proposal::STATUS)),
 
                 Tables\Filters\Filter::make('today')
                     ->label('Offenders Today')
@@ -138,7 +119,7 @@ class MessageResource extends Resource
                         $query->whereDate('created_at', $today)
                             ->where(function ($query) use ($patterns) {
                                 foreach ($patterns as $name => $pattern) {
-                                    $query->orWhereRaw("body REGEXP ?", [$pattern]);
+                                    $query->orWhereRaw("description REGEXP ?", [$pattern]);
                                 }
                             });
                     }),
@@ -154,7 +135,7 @@ class MessageResource extends Resource
                         $query->whereBetween('created_at', [$startOfWeek, $endOfWeek])
                             ->where(function ($query) use ($patterns) {
                                 foreach ($patterns as $name => $pattern) {
-                                    $query->orWhereRaw("body REGEXP ?", [$pattern]);
+                                    $query->orWhereRaw("description REGEXP ?", [$pattern]);
                                 }
                             });
                     }),
@@ -170,7 +151,7 @@ class MessageResource extends Resource
                         $query->whereBetween('created_at', [$startOfMonth, $endOfMonth])
                             ->where(function ($query) use ($patterns) {
                                 foreach ($patterns as $name => $pattern) {
-                                    $query->orWhereRaw("body REGEXP ?", [$pattern]);
+                                    $query->orWhereRaw("description REGEXP ?", [$pattern]);
                                 }
                             });
                     }),
@@ -183,7 +164,7 @@ class MessageResource extends Resource
 
                         $query->where(function ($query) use ($patterns) {
                             foreach ($patterns as $name => $pattern) {
-                                $query->orWhereRaw("body REGEXP ?", [$pattern]);
+                                $query->orWhereRaw("description REGEXP ?", [$pattern]);
                             }
                         });
                     }),
@@ -191,7 +172,6 @@ class MessageResource extends Resource
             ])
             ->actions([
                 // Tables\Actions\EditAction::make(),
-
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\Action::make('warn_sender')
                         ->label('Warn Sender')
@@ -231,8 +211,6 @@ class MessageResource extends Resource
                         ->color('danger')
                         ->action(function ($record) {}),
                 ]),
-
-
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -251,9 +229,9 @@ class MessageResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListMessages::route('/'),
-            'create' => Pages\CreateMessage::route('/create'),
-            'edit' => Pages\EditMessage::route('/{record}/edit'),
+            'index' => Pages\ListProposals::route('/'),
+            'create' => Pages\CreateProposal::route('/create'),
+            'edit' => Pages\EditProposal::route('/{record}/edit'),
         ];
     }
 }
