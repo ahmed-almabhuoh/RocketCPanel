@@ -12,11 +12,23 @@ class TransferCode extends Model
     use HasFactory;
 
     protected $fillable = [
-        'secret', 'code', 'only_for', 'status', 'user_id', 'limited', 'time_to_use', 'created_at'
+        'secret',
+        'code',
+        'only_for',
+        'status',
+        'user_id',
+        'limited',
+        'time_to_use',
+        'created_at'
     ];
 
     const STATUS = [
-        'active', 'inactive'
+        'active',
+        'inactive'
+    ];
+
+    protected $casts = [
+        'only_for' => 'array',
     ];
 
     const UPDATED_AT = null;
