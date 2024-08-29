@@ -29,7 +29,7 @@ class Transaction extends Model
     ];
 
     protected $casts = [
-        // 'method_meta' => 'array',
+        'method_meta' => 'array',
     ];
 
     protected $guarded = [];

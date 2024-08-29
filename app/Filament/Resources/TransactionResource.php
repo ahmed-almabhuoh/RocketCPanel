@@ -25,6 +25,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use ValentinMorice\FilamentJsonColumn\FilamentJsonColumn;
 
 class TransactionResource extends Resource
 {
@@ -65,29 +66,13 @@ class TransactionResource extends Resource
                 //
                 Group::make()->schema([
                     Section::make('Transaction Payload')->schema([
-                        MarkdownEditor::make('method_meta')
-                            ->label('Transaction Payload')
-                            ->disabled(),
 
-                        // KeyValue::make('method_meta')
-                        //     ->label('Transaction Payload')
-                        //     ->disabled(),
+                        FilamentJsonColumn::make('method_meta')
+                            ->label('Transaction Payload'),
 
-                        // Fieldset::make('method_meta')->json(),
-                        // Repeater::make('method_meta')
-                        //     ->schema([
-                        //         TextInput::make('key')
-                        //             ->label('Key')
-                        //             ->required(),
-                        //         TextInput::make('value')
-                        //             ->label('Value')
-                        //             ->required(),
-                        //     ])
-                        //     ->label('JSON Data')
-                        //     ->columns(2)
-                        //     ->defaultItems(1),
                     ]),
                 ])->columnSpanFull(),
+
             ]);
     }
 
