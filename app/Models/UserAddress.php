@@ -10,12 +10,14 @@ class UserAddress extends Model
 {
     use HasFactory;
 
-    protected $guarded = [
+    protected $fillable = [
         'primary_address',
         'optional_address',
         'state',
         'country',
         'user_id',
+        'created_at',
+        'updated_at',
     ];
 
     public function user(): BelongsTo
