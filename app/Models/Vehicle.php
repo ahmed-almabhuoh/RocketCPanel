@@ -17,7 +17,7 @@ class Vehicle extends Model
 
     public function director(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'driver_id', 'id');
+        return $this->belongsTo(User::class, 'director_id', 'id');
     }
 
     public function schedules(): HasMany
