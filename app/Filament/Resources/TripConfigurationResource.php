@@ -26,7 +26,7 @@ class TripConfigurationResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-adjustments-horizontal';
 
-    protected static ?string $navigationGroup = 'Content Management - CM -';
+    protected static ?string $navigationGroup = 'Trip Configurations - TC -';
 
     protected static ?string $navigationLabel = 'Trip Configuration';
 

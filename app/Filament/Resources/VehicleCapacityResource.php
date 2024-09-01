@@ -25,7 +25,7 @@ class VehicleCapacityResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-cube-transparent';
 
-    protected static ?string $navigationGroup = 'Content Management - CM -';
+    protected static ?string $navigationGroup = 'Trip Configurations - TC -';
 
     protected static ?string $navigationLabel = 'Vehicle Capacity';
 

@@ -31,7 +31,7 @@ class TripResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-arrow-trending-up';
 
-    protected static ?string $navigationGroup = 'Content Management - CM -';
+    protected static ?string $navigationGroup = 'Trip Configurations - TC -';
 
     protected static ?string $navigationLabel = 'Trips Management';
 

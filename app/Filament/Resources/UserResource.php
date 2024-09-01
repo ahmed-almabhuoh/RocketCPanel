@@ -30,7 +30,7 @@ class UserResource extends Resource
 
     protected static ?string $navigationLabel = 'Users & admins';
 
-    protected static ?int $navigationSort = 0;
+    protected static ?int $navigationSort = -1;
 
     public static function form(Form $form): Form
     {

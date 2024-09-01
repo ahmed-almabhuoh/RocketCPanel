@@ -20,7 +20,7 @@ class SecurityQuestionResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-question-mark-circle';
 
-    protected static ?string $navigationGroup = 'Content Management - CM -';
+    protected static ?string $navigationGroup = 'Security Configuration - SC -';
 
     protected static ?string $navigationLabel = 'Security Questions';
 
