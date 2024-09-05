@@ -83,7 +83,8 @@ class GiftResource extends Resource
                             ->label('Percentage')
                             ->required()
                             ->maxValue(100)
-                            ->minValue(1),
+                            ->default(0)
+                            ->minValue(0),
 
                     ])->columns(2),
                 ])
